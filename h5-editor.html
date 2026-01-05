@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自定义图文H5页面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "微软雅黑", sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .editor-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .tool-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            background-color: #409eff;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #337ecc;
+        }
+        #text-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .preview-area {
+            min-height: 300px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+        }
+        .preview-area p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        .preview-area img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .empty-tip {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #999;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="editor-title">H5图文编辑</h2>
+        <div class="tool-bar">
+            <input type="text" id="text-input" placeholder="输入要添加的文字">
+            <button id="add-text-btn">添加文字</button>
+            <button id="add-img-btn">添加图片</button>
+            <input type="file" id="img-input" accept="image/*" style="display: none;">
+        </div>
+        <div class="preview-area" id="preview-area">
+            <div class="empty-tip">点击按钮添加文字或图片</div>
+        </div>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const textInput = document.getElementById('text-input');
+        const addTextBtn = document.getElementById('add-text-btn');
+        const addImgBtn = document.getElementById('add-img-btn');
+        const imgInput = document.getElementById('img-input');
+        const previewArea = document.getElementById('preview-area');
+
+        // 初始化隐藏空提示
+        function checkEmpty() {
+            const hasContent = previewArea.children.length > 1 || (previewArea.children.length === 1 && previewArea.children[0].tagName !== 'DIV');
+            document.querySelector('.empty-tip').style.display = hasContent ? 'none' : 'block';
+        }
+
+        // 添加文字
+        addTextBtn.addEventListener('click', () => {
+            const text = textInput.value.trim();
+            if (!text) return alert('请输入文字内容');
+            const p = document.createElement('p');
+            p.textContent = text;
+            previewArea.appendChild(p);
+            textInput.value = '';
+            checkEmpty();
+        });
+
+        // 点击添加图片按钮触发文件选择
+        addImgBtn.addEventListener('click', () => {
+            imgInput.click();
+        });
+
+        // 选择图片后预览
+        imgInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = document.createElement('img');
+                img.src = event.target.result;
+                img.alt = '自定义图片';
+                previewArea.appendChild(img);
+                checkEmpty();
+            };
+            reader.readAsDataURL(file);
+            // 重置文件输入，可重复选择同一张图
+            imgInput.value = '';
+        });
+
+        // 初始化检查
+        checkEmpty();
+    </script>
+</body>
+</html>
